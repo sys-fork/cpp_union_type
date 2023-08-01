@@ -25,6 +25,11 @@ public:
         this->v = std::move(v);
         return *this;
     }
+    Union& operator=(const Union& s) {
+        this->u = std::move(s.u);
+        this->v = std::move(s.v);
+        return *this;
+    }
     operator U() const noexcept {
         return u;
     }
