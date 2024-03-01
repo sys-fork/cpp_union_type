@@ -6,8 +6,41 @@
 template <class...>
 struct Union;
 
-template <class T>
-struct Union<T> : T {};
+template <class U>
+struct Union<U> {
+private:
+    U u;
+    bool u_is_set;
+public:
+    Union() = default;
+    Union(const U& u_) : u(u_), u_is_set(true) {}
+    Union(U&& u_) : u(std::move(u_)), u_is_set(true) {}
+
+    Union& operator=(const U& u_) {
+        u = u_;
+        u_is_set = true;
+        return *this;
+    }
+    Union& operator=(U&& u_) {
+        u = std::move(u_);
+        u_is_set = true;
+        return *this;
+    }
+    // ムーブ代入演算子はデフォルト
+
+    operator U() const noexcept {
+        if (!u_is_set) {
+            std::cerr
+                << "Union Type Error: Required type "
+                << typeid(U).name()
+                << " is not set." << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+        return u;
+    }
+
+    virtual ~Union() = default;
+};
 
 template <class U, class V, class ...Rest>
 struct Union<U, V, Rest...> {
@@ -65,6 +98,8 @@ public:
         }
         return u;
     }
+
+    virtual ~Union() = default;
 };
 
 template <class U, class V>
