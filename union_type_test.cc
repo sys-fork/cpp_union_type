@@ -12,10 +12,11 @@ void g(std::string s) {
 
 int main(void)
 {
-    Union<int, std::string> u;
+    Union<int, std::string, float> u = 1;
 
     u = 1;
     f(u);
     u = "Hello, world!";
     g(u);
+    // f(u); -> Error
 }
