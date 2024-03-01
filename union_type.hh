@@ -11,7 +11,7 @@ namespace union_type {
     struct Union<U> {
     private:
         U u;
-        bool u_is_set;
+        bool u_is_set = false;
     public:
         Union() = default;
         Union(const U& u_) : u(u_), u_is_set(true) {}
@@ -44,12 +44,12 @@ namespace union_type {
         }
 
         template <class T, class S>
-        friend auto holds_alternative(Union<S>) noexcept
-            -> std::enable_if_t<!std::is_same_v<std::decay_t<T>, U>, bool>;
+        friend auto holds_alternative(const Union<S>&) noexcept
+            -> std::enable_if_t<!std::is_same_v<std::decay_t<T>, S>, bool>;
 
         template <class T, class S>
-        friend auto holds_alternative(Union<S>) noexcept
-            -> std::enable_if_t<std::is_same_v<std::decay_t<T>, U>, bool>;
+        friend auto holds_alternative(const Union<S>&) noexcept
+            -> std::enable_if_t<std::is_same_v<std::decay_t<T>, S>, bool>;
 
         virtual ~Union() = default;
     };
@@ -61,7 +61,7 @@ namespace union_type {
     }
 
     template <class T, class U>
-    auto holds_alternative(const Union<U>& u)
+    auto holds_alternative(const Union<U>& u) noexcept
         -> std::enable_if_t<std::is_same_v<std::decay_t<T>, U>, bool> {
         return u.u_is_set;
     }
