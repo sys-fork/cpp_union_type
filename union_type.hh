@@ -14,13 +14,16 @@ private:
 public:
     Union() = default;
     Union(const U& u_) : u(u_), u_is_set(true) {}
+    // コピーコンストラクタはデフォルト
     Union(U&& u_) : u(std::move(u_)), u_is_set(true) {}
+    // ムーブコンストラクタはデフォルト
 
     Union& operator=(const U& u_) {
         u = u_;
         u_is_set = true;
         return *this;
     }
+    // コピー代入演算子はデフォルト
     Union& operator=(U&& u_) {
         u = std::move(u_);
         u_is_set = true;
