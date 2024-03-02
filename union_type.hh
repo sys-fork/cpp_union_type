@@ -45,24 +45,24 @@ namespace union_type {
 
         template <class T, class S>
         friend auto holds_alternative(const Union<S>&) noexcept
-            -> std::enable_if_t<!std::is_same_v<std::decay_t<T>, S>, bool>;
+            -> std::enable_if_t<!std::is_same_v<T, S>, bool>;
 
         template <class T, class S>
         friend auto holds_alternative(const Union<S>&) noexcept
-            -> std::enable_if_t<std::is_same_v<std::decay_t<T>, S>, bool>;
+            -> std::enable_if_t<std::is_same_v<T, S>, bool>;
 
         virtual ~Union() = default;
     };
 
     template <class T, class U>
     auto holds_alternative(const Union<U>&) noexcept
-        -> std::enable_if_t<!std::is_same_v<std::decay_t<T>, U>, bool> {
+        -> std::enable_if_t<!std::is_same_v<T, U>, bool> {
         return false;
     }
 
     template <class T, class U>
     auto holds_alternative(const Union<U>& u) noexcept
-        -> std::enable_if_t<std::is_same_v<std::decay_t<T>, U>, bool> {
+        -> std::enable_if_t<std::is_same_v<T, U>, bool> {
         return u.u_is_set;
     }
 
@@ -77,13 +77,14 @@ namespace union_type {
     public:
         Union() = default;
 
-        template <class T, std::enable_if_t<!std::is_same_v<T, U>, std::nullptr_t> = nullptr>
+        template <class T>
         Union(T&& t_) : v(std::forward<T>(t_)), v_is_set(true) {}
 
-        template <class T, std::enable_if_t<std::is_same_v<T, U>, std::nullptr_t> = nullptr>
-        Union(T&& t_) : u(std::forward<T>(t_)), u_is_set(true) {}
+        Union(const U& u_) : u(u_), u_is_set(true) {}
 
-        template <class T, std::enable_if_t<!std::is_same_v<std::decay_t<T>, U>, std::nullptr_t> = nullptr>
+        Union(U&& u_) : u(std::move(u_)), u_is_set(true) {}
+
+        template <class T>
         Union& operator=(T&& t_) {
             v = std::forward<T>(t_);
             u_is_set = false;
@@ -91,15 +92,21 @@ namespace union_type {
             return *this;
         }
 
-        template <class T, std::enable_if_t<std::is_same_v<std::decay_t<T>, U>, std::nullptr_t> = nullptr>
-        Union& operator=(T&& t_) {
-            u = std::forward<T>(t_);
+        Union& operator=(const U& u_) {
+            u = u_;
             u_is_set = true;
             v_is_set = false;
             return *this;
         }
 
-        template <class T, std::enable_if_t<!std::is_same<std::decay_t<T>, U>::value, std::nullptr_t> = nullptr>
+        Union& operator=(U&& t_) {
+            u = std::move(t_);
+            u_is_set = true;
+            v_is_set = false;
+            return *this;
+        }
+
+        template <class T>
         operator T() const {
             if (!v_is_set) {
                 std::cerr
@@ -113,12 +120,11 @@ namespace union_type {
             return v;
         }
 
-        template <class T, std::enable_if_t<std::is_same<std::decay_t<T>, U>::value, std::nullptr_t> = nullptr>
-        operator T() const {
+        operator U() const {
             if (!u_is_set) {
                 std::cerr
                     << "Union Type Error: Required type "
-                    << typeid(T).name()
+                    << typeid(U).name()
                     << " is not set." << std::endl;
                 std::exit(EXIT_FAILURE);
             }
