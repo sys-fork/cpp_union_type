@@ -45,10 +45,6 @@ namespace union_type {
 
         template <class T, class S>
         friend auto holds_alternative(const Union<S>&) noexcept
-            -> std::enable_if_t<!std::is_same_v<T, S>, bool>;
-
-        template <class T, class S>
-        friend auto holds_alternative(const Union<S>&) noexcept
             -> std::enable_if_t<std::is_same_v<T, S>, bool>;
 
         virtual ~Union() = default;
