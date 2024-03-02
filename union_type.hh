@@ -141,7 +141,7 @@ namespace union_type {
     template <class T, class U, class V, class ...Rest>
     auto holds_alternative(const Union<U, V, Rest...>& u) noexcept
         -> std::enable_if_t<!std::is_same_v<std::decay_t<T>, U>, bool> {
-        return u.v_is_set && holds_alternative<T>(u);
+        return u.v_is_set && holds_alternative<T>(u.v);
     }
 
     template <class T, class U, class V, class ...Rest>
