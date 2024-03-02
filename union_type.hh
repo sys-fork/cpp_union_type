@@ -95,8 +95,8 @@ namespace union_type {
             return *this;
         }
 
-        Union& operator=(U&& t_) {
-            u = std::move(t_);
+        Union& operator=(U&& u_) {
+            u = std::move(u_);
             u_is_set = true;
             v_is_set = false;
             return *this;
