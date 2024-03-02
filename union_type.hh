@@ -44,20 +44,20 @@ namespace union_type {
         }
 
         template <class T, class S>
-        friend auto holds_alternative(const Union<S>&) noexcept
+        friend auto has_type(const Union<S>&) noexcept
             -> std::enable_if_t<std::is_same_v<T, S>, bool>;
 
         virtual ~Union() = default;
     };
 
     template <class T, class U>
-    auto holds_alternative(const Union<U>&) noexcept
+    auto has_type(const Union<U>&) noexcept
         -> std::enable_if_t<!std::is_same_v<T, U>, bool> {
         return false;
     }
 
     template <class T, class U>
-    auto holds_alternative(const Union<U>& u) noexcept
+    auto has_type(const Union<U>& u) noexcept
         -> std::enable_if_t<std::is_same_v<T, U>, bool> {
         return u.u_is_set;
     }
@@ -128,24 +128,24 @@ namespace union_type {
         }
 
         template <class T, class S, class W, class ...Rest_types>
-        friend auto holds_alternative(const Union<S, W, Rest_types...>&) noexcept
+        friend auto has_type(const Union<S, W, Rest_types...>&) noexcept
             -> std::enable_if_t<!std::is_same_v<T, S>, bool>;
 
         template <class T, class S, class W, class ...Rest_types>
-        friend auto holds_alternative(const Union<S, W, Rest_types...>&) noexcept
+        friend auto has_type(const Union<S, W, Rest_types...>&) noexcept
             -> std::enable_if_t<std::is_same_v<T, S>, bool>;
 
         virtual ~Union() = default;
     };
 
     template <class T, class U, class V, class ...Rest>
-    auto holds_alternative(const Union<U, V, Rest...>& u) noexcept
+    auto has_type(const Union<U, V, Rest...>& u) noexcept
         -> std::enable_if_t<!std::is_same_v<T, U>, bool> {
-        return u.v_is_set && holds_alternative<T>(u.v);
+        return u.v_is_set && has_type<T>(u.v);
     }
 
     template <class T, class U, class V, class ...Rest>
-    auto holds_alternative(const Union<U, V, Rest...>& u) noexcept
+    auto has_type(const Union<U, V, Rest...>& u) noexcept
         -> std::enable_if_t<std::is_same_v<T, U>, bool> {
         return u.u_is_set;
     }

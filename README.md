@@ -20,7 +20,7 @@ void g(std::string s)
 
 void h(union_type::Union<int, std::string> u)
 {
-    if (union_type::holds_alternative<int>(u)) {
+    if (union_type::has_type<int>(u)) {
         std::cout << static_cast<int>(u) + 1 << std::endl;
     } else {
         std::cout << "You said: " + static_cast<std::string>(u) << std::endl;
