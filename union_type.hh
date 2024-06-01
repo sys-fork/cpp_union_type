@@ -43,12 +43,34 @@ namespace union_type {
             return u;
         }
 
+        template <class T>
+        friend std::ostream& operator<<(std::ostream&, Union<T>&);
+
+        template <class T, class S>
+        friend auto has_type(const Union<S>&) noexcept
+            -> std::enable_if_t<!std::is_same_v<T, S>, bool>;
+
         template <class T, class S>
         friend auto has_type(const Union<S>&) noexcept
             -> std::enable_if_t<std::is_same_v<T, S>, bool>;
 
         virtual ~Union() = default;
     };
+
+    template <class U>
+    std::ostream& operator<<(std::ostream& os, Union<U>& u) {
+        if (u.u_is_set) {
+            os << static_cast<U>(u);
+        } else {
+            std::cerr
+                << "Union Type Error: operator<< was called "
+                << "even though nothing was set for the Union instance."
+                << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+
+        return os;
+    }
 
     template <class T, class U>
     auto has_type(const Union<U>&) noexcept
@@ -127,6 +149,9 @@ namespace union_type {
             return u;
         }
 
+        template <class T, class S, class ...Rest_Types>
+        friend std::ostream& operator<<(std::ostream&, Union<T, S, Rest_Types...>&);
+
         template <class T, class S, class W, class ...Rest_types>
         friend auto has_type(const Union<S, W, Rest_types...>&) noexcept
             -> std::enable_if_t<!std::is_same_v<T, S>, bool>;
@@ -137,6 +162,23 @@ namespace union_type {
 
         virtual ~Union() = default;
     };
+
+    template <class U, class V, class ...Rest>
+    std::ostream& operator<<(std::ostream& os, Union<U, V, Rest...>& u) {
+        if (u.u_is_set) {
+            os << static_cast<U>(u);
+        } else if (u.v_is_set) {
+            os << u.v;
+        } else {
+            std::cerr
+                << "Union Type Error: operator<< was called "
+                << "even though nothing was set for the Union instance."
+                << std::endl;
+            std::exit(EXIT_FAILURE);
+        }
+
+        return os;
+    }
 
     template <class T, class U, class V, class ...Rest>
     auto has_type(const Union<U, V, Rest...>& u) noexcept
